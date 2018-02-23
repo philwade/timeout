@@ -1,15 +1,43 @@
-{-# LANGUAGE OverloadedStrings #-}
 module Lib
-    ( main
+    ( uncomment
+    , comment
+    , createEntryLine
+    , isEntry
+    , getName
     ) where
 
-import System.Cron.Schedule
+import Data.List
+import Text.Regex.Posix
 
-main :: IO ()
-main = do
-    tids <- execSchedule $ do
-        addJob job1 "* * * * *"
-    print tids
+uncomment :: String -> String
+uncomment (x:xs) =
+    case x of
+        '#' -> uncomment xs
+        _ -> x:xs
+uncomment line = line
 
-job1 :: IO ()
-job1 = putStrLn "heyoheyo"
+comment :: String -> String
+comment (x:xs) =
+    case x of
+        '#' -> x:xs
+        _ -> '#':x:xs
+comment "" = ""
+
+createEntryLine :: String -> [String] -> String
+createEntryLine name urls =
+    "127.0.0.1 " ++ (intercalate " " urls) ++ " #timeout:" ++ name
+
+pattern :: String
+pattern = "#timeout:(.*)$"
+
+isEntry :: String -> Bool
+isEntry line = line =~ pattern :: Bool
+
+getName :: String -> Maybe String
+getName line =
+    let
+        values = line =~ pattern :: [[String]]
+    in
+        case values of
+            ((_:z:_):_) -> Just z
+            _ -> Nothing
