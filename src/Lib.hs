@@ -4,6 +4,7 @@ module Lib
     , createEntryLine
     , isEntry
     , getName
+    , transformNamedEntries
     ) where
 
 import Data.List
@@ -41,3 +42,16 @@ getName line =
         case values of
             ((_:z:_):_) -> Just z
             _ -> Nothing
+
+transformNamedEntries :: (String -> String) -> [String] -> [String] -> [String]
+transformNamedEntries transform names filecontents =
+    map (\line ->
+            case isEntry line of
+                True -> case getName line of
+                            Just a ->
+                                if a `elem` names then
+                                    transform line
+                                else
+                                    line
+                            _ -> line
+                False -> line) filecontents

@@ -34,3 +34,33 @@ main = hspec $ do
                 getName "127.0.0.1 example.com #timeout:example" `shouldBe` (Just "example")
             it "should return Nothing from a non line" $
                 getName "127.0.0.1 example.com" `shouldBe` Nothing
+        describe "tranformNamedEntries" $ do
+            let commented = [ "# localhost is used to configure the loopback interface"
+                        , "# when the system is booting.  Do not change this entry."
+                        , "##"
+                        , "127.0.0.1   localhost"
+                        , "#127.0.0.1 example.com #timeout:example"
+                        , "#127.0.0.1 example.com #timeout:example2"
+                        ]
+            let uncommented = [ "# localhost is used to configure the loopback interface"
+                        , "# when the system is booting.  Do not change this entry."
+                        , "##"
+                        , "127.0.0.1   localhost"
+                        , "127.0.0.1 example.com #timeout:example"
+                        , "#127.0.0.1 example.com #timeout:example2"
+                        ]
+            let multiuncommented = [ "# localhost is used to configure the loopback interface"
+                        , "# when the system is booting.  Do not change this entry."
+                        , "##"
+                        , "127.0.0.1   localhost"
+                        , "127.0.0.1 example.com #timeout:example"
+                        , "127.0.0.1 example.com #timeout:example2"
+                        ]
+            it "should uncomment a named line in a file" $
+                transformNamedEntries uncomment ["example"] commented `shouldBe` uncommented
+            it "should comment a named line in a file" $
+                transformNamedEntries comment ["example"] uncommented `shouldBe` commented
+            it "should uncommment multiple named lines" $
+                transformNamedEntries uncomment ["example", "example2"] commented `shouldBe` multiuncommented
+            it "should leave lines alone in a file with empty names" $
+                transformNamedEntries comment [] uncommented `shouldBe` uncommented
