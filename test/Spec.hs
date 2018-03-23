@@ -64,3 +64,23 @@ main = hspec $ do
                 transformNamedEntries uncomment ["example", "example2"] commented `shouldBe` multiuncommented
             it "should leave lines alone in a file with empty names" $
                 transformNamedEntries comment [] uncommented `shouldBe` uncommented
+        describe "tranformAllEntries" $ do
+            let commented = [ "# localhost is used to configure the loopback interface"
+                        , "# when the system is booting.  Do not change this entry."
+                        , "##"
+                        , "127.0.0.1   localhost"
+                        , "#127.0.0.1 example.com #timeout:example"
+                        , "#127.0.0.1 example.com #timeout:example2"
+                        ]
+            let uncommented = [ "# localhost is used to configure the loopback interface"
+                        , "# when the system is booting.  Do not change this entry."
+                        , "##"
+                        , "127.0.0.1   localhost"
+                        , "127.0.0.1 example.com #timeout:example"
+                        , "127.0.0.1 example.com #timeout:example2"
+                        ]
+            it "should uncomment all entries in a file" $
+                transformAllEntries uncomment commented `shouldBe` uncommented
+            it "should comment all entries in a file" $
+                transformAllEntries comment uncommented `shouldBe` commented
+
