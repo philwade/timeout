@@ -83,4 +83,30 @@ main = hspec $ do
                 transformAllEntries uncomment commented `shouldBe` uncommented
             it "should comment all entries in a file" $
                 transformAllEntries comment uncommented `shouldBe` commented
+        describe "addEntry" $ do
+            let given = [ "# localhost is used to configure the loopback interface"
+                        , "# when the system is booting.  Do not change this entry."
+                        , "##"
+                        , "127.0.0.1   localhost"
+                        , "#127.0.0.1 example.com #timeout:example"
+                        ]
+            let expected = [ "# localhost is used to configure the loopback interface"
+                        , "# when the system is booting.  Do not change this entry."
+                        , "##"
+                        , "127.0.0.1   localhost"
+                        , "#127.0.0.1 example.com #timeout:example"
+                        , "127.0.0.1 example.com #timeout:example2"
+                        ]
+            let expectedMulti = [ "# localhost is used to configure the loopback interface"
+                        , "# when the system is booting.  Do not change this entry."
+                        , "##"
+                        , "127.0.0.1   localhost"
+                        , "#127.0.0.1 example.com #timeout:example"
+                        , "127.0.0.1 example.com test.com #timeout:example2"
+                        ]
+
+            it "should add an entry to the end of the file" $ do
+                addEntry "example2" ["example.com"] given `shouldBe` expected
+            it "should add an entry with multiple urls to the end of the file" $ do
+                addEntry "example2" ["example.com", "test.com"] given `shouldBe` expectedMulti
 

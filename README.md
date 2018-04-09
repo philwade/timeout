@@ -6,3 +6,7 @@ To build/run:
 
     $ stack build
     $ stack exec timeout-exe
+
+Build watch:
+
+    $ stack build --test --pedantic --fast --file-watch

@@ -8,6 +8,7 @@ module Lib
     , transformAllEntries
     , uncommentAll
     , commentAll
+    , addEntry
     , HostFile
     ) where
 
@@ -75,3 +76,7 @@ uncommentAll = transformAllEntries uncomment
 
 commentAll :: HostFile -> HostFile
 commentAll = transformAllEntries comment
+
+addEntry :: String -> [String] -> HostFile -> HostFile
+addEntry name urls hosts =
+    hosts ++ [(createEntryLine name urls)]
