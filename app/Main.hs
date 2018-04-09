@@ -14,8 +14,10 @@ main = do
 updateHosts :: [String] -> HostFile -> HostFile
 updateHosts args hosts =
     case args of
-        ["out"] -> commentAll hosts
-        ["in"] -> uncommentAll hosts
-        "in":names -> transformNamedEntries uncomment names hosts
-        "out":names -> transformNamedEntries comment names hosts
+        ["out"] -> uncommentAll hosts
+        ["in"] -> commentAll hosts
+        "in":names -> transformNamedEntries comment names hosts
+        "out":names -> transformNamedEntries uncomment names hosts
+        "add":name:urls -> addEntry name urls hosts
+        [] -> uncommentAll hosts
         _ -> hosts
