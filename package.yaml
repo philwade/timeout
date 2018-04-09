@@ -24,6 +24,7 @@ dependencies:
 - hspec
 - regex-posix
 - unix
+- strict
 
 library:
   source-dirs: src

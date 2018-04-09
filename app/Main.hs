@@ -1,15 +1,20 @@
 module Main where
 
-import System.IO
+import Prelude hiding (readFile)
+import System.IO.Strict (readFile)
 import System.Environment
 import Lib
 
+hostsFile :: String
+hostsFile = "samplehosts"
+
 main :: IO ()
 main = do
-        hosts <- openFile "samplehosts" ReadMode
-        hostcontent <- hGetContents hosts
+        hostcontent <- readFile hostsFile
         args <- getArgs
-        putStrLn $ unlines $ updateHosts args (lines hostcontent)
+        let newhosts = unlines $ updateHosts args (lines hostcontent)
+        putStrLn newhosts
+        writeFile hostsFile newhosts
 
 updateHosts :: [String] -> HostFile -> HostFile
 updateHosts args hosts =
