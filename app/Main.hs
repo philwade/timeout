@@ -88,8 +88,8 @@ printUsage =
 updateHosts :: ChangeType -> HostFile -> HostFile
 updateHosts change hosts =
     case change of
-        Off -> commentAll hosts
-        On -> uncommentAll hosts
-        TargetedOn names -> transformNamedEntries uncomment names hosts
-        TargetedOff names -> transformNamedEntries comment names hosts
+        Off -> uncommentAll hosts
+        On -> commentAll hosts
+        TargetedOn names -> transformNamedEntries comment names hosts
+        TargetedOff names -> transformNamedEntries uncomment names hosts
         AddEntry name urls -> addEntry name urls hosts
