@@ -5,6 +5,7 @@ import System.IO.Strict (readFile)
 import Data.List (intercalate)
 import System.Environment
 import System.Posix.Files
+import System.Console.ANSI
 import Lib
 
 hostsFile :: String
@@ -24,9 +25,22 @@ main = do
                         let change = getChangeFromArgs args
                         let newhosts = unlines $ updateHosts change (lines hostcontent)
                         writeFile hostsFile newhosts
+                        setConsoleColor change
                         displayChange change
                 else
+                    do
+                    setSGR [SetColor Foreground Vivid Red]
                     putStrLn $ "Please run with sudo so I can modify " ++ hostsFile
+        setSGR [Reset]
+
+setConsoleColor :: ChangeType -> IO ()
+setConsoleColor change =
+    case change of
+        On -> setSGR [SetColor Foreground Vivid Red]
+        Off -> setSGR [SetColor Foreground Vivid Green]
+        TargetedOff _ -> setSGR [SetColor Foreground Vivid Green]
+        TargetedOn _ -> setSGR [SetColor Foreground Vivid Red]
+        _ -> return ()
 
 displayChange :: ChangeType -> IO ()
 displayChange change =

@@ -25,6 +25,7 @@ dependencies:
 - regex-posix
 - unix
 - strict
+- ansi-terminal
 
 library:
   source-dirs: src
