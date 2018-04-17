@@ -2,6 +2,7 @@ module Main where
 
 import Prelude hiding (readFile)
 import System.IO.Strict (readFile)
+import Data.List (intercalate)
 import System.Environment
 import System.Posix.Files
 import Lib
@@ -20,11 +21,21 @@ main = do
                 if haveAccess then
                         do
                         hostcontent <- readFile hostsFile
-                        let newhosts = unlines $ updateHosts args (lines hostcontent)
-                        putStrLn newhosts
+                        let change = getChangeFromArgs args
+                        let newhosts = unlines $ updateHosts change (lines hostcontent)
                         writeFile hostsFile newhosts
+                        displayChange change
                 else
                     putStrLn $ "Please run with sudo so I can modify " ++ hostsFile
+
+displayChange :: ChangeType -> IO ()
+displayChange change =
+    case change of
+        On -> putStrLn "Unblocked all sites"
+        Off -> putStrLn "Blocked all sites"
+        TargetedOff names -> putStrLn $ "Blocked sites: " ++ (intercalate ", " names)
+        TargetedOn names -> putStrLn $ "Unblocked sites: " ++ (intercalate ", " names)
+        AddEntry name urls -> putStrLn $ "Added site " ++ name ++ " with urls " ++ (intercalate ", " urls) ++ " to blocking"
 
 printUsage :: IO ()
 printUsage =
@@ -60,13 +71,11 @@ printUsage =
         putStrLn "Unblock twitter and facebook:"
         putStrLn "  $ timeout in twitter facebook"
 
-updateHosts :: [String] -> HostFile -> HostFile
-updateHosts args hosts =
-    case args of
-        ["out"] -> uncommentAll hosts
-        ["in"] -> commentAll hosts
-        "in":names -> transformNamedEntries comment names hosts
-        "out":names -> transformNamedEntries uncomment names hosts
-        "add":name:urls -> addEntry name urls hosts
-        [] -> uncommentAll hosts
-        _ -> hosts
+updateHosts :: ChangeType -> HostFile -> HostFile
+updateHosts change hosts =
+    case change of
+        Off -> commentAll hosts
+        On -> uncommentAll hosts
+        TargetedOn names -> transformNamedEntries uncomment names hosts
+        TargetedOff names -> transformNamedEntries comment names hosts
+        AddEntry name urls -> addEntry name urls hosts

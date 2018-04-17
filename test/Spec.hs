@@ -109,4 +109,16 @@ main = hspec $ do
                 addEntry "example2" ["example.com"] given `shouldBe` expected
             it "should add an entry with multiple urls to the end of the file" $ do
                 addEntry "example2" ["example.com", "test.com"] given `shouldBe` expectedMulti
-
+        describe "getGetChangeFromArgs" $ do
+            it "should return Off by default" $
+                getChangeFromArgs [] `shouldBe` Off
+            it "should return Off for off" $
+                getChangeFromArgs ["out"] `shouldBe` Off
+            it "should return Off for on" $
+                getChangeFromArgs ["in"] `shouldBe` On
+            it "should return TargetedOn for on with arguments" $
+                getChangeFromArgs ["in", "1", "2"] `shouldBe` TargetedOn ["1", "2"]
+            it "should return TargetedOff for off with arguments" $
+                getChangeFromArgs ["out", "1", "2"] `shouldBe` TargetedOff ["1", "2"]
+            it "should return AddEntry for add with arguments" $
+                getChangeFromArgs ["add", "1", "2"] `shouldBe` AddEntry "1" ["2"]

@@ -10,6 +10,8 @@ module Lib
     , commentAll
     , addEntry
     , HostFile
+    , ChangeType (..)
+    , getChangeFromArgs
     ) where
 
 import Data.List
@@ -80,3 +82,21 @@ commentAll = transformAllEntries comment
 addEntry :: String -> [String] -> HostFile -> HostFile
 addEntry name urls hosts =
     hosts ++ [(createEntryLine name urls)]
+
+data ChangeType = On
+                | Off
+                | TargetedOn [String]
+                | TargetedOff [String]
+                | AddEntry String [String]
+                deriving (Show, Eq)
+
+getChangeFromArgs :: [String] -> ChangeType
+getChangeFromArgs args =
+    case args of
+        ["out"] -> Off
+        ["in"] -> On
+        "in":names -> TargetedOn names
+        "out":names -> TargetedOff names
+        "add":name:urls -> AddEntry name urls
+        [] -> Off
+        _ -> error "Unknown arguments"
