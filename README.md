@@ -8,7 +8,7 @@ This is a tool for managing host files for productivity, once I start getting st
 To build/run:
 
     $ stack build
-    $ stack exec timeout-exe
+    $ stack exec timeout
 
 Build watch:
 
